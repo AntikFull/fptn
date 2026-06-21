@@ -32,7 +32,7 @@ jobs:
             apt-packages: gcc-mipsel-linux-gnu g++-mipsel-linux-gnu
             cc: mipsel-linux-gnu-gcc
             cxx: mipsel-linux-gnu-g++
-            flags: '["-DOPENSSL_THREADS", "-DOPENSSL_PTHREADS", "-pthread", "-march=mips32r2"]'
+            flags: '["-DOPENSSL_PTHREADS", "-pthread", "-march=mips32r2"]'
 
     steps:
       - name: Checkout code
@@ -66,6 +66,7 @@ jobs:
           tools.build:compiler_executables={"c": "${{ matrix.cc }}", "cpp": "${{ matrix.cxx }}"}
           tools.build:cflags=${{ matrix.flags }}
           tools.build:cxxflags=${{ matrix.flags }}
+          tools.build:asmflags=${{ matrix.flags }}
           EOF
 
       - name: Install Conan Dependencies
