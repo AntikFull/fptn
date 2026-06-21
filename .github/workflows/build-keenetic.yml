@@ -72,8 +72,6 @@ jobs:
           tools.build:compiler_executables={"c": "${{ matrix.cc }}", "cpp": "${{ matrix.cxx }}"}
           tools.build:cflags=${{ matrix.flags }}
           tools.build:cxxflags=${{ matrix.flags }}
-          tools.build:exelinkflags=["-static"]
-          tools.build:sharedlinkflags=["-static"]
           EOF
 
       - name: Install Conan Dependencies
