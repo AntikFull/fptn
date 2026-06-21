@@ -22,6 +22,12 @@ else()
   message(FATAL_ERROR "Unsupported platform")
 endif()
 
+if(UNIX AND NOT APPLE)
+  set(PLATFORM_LIBS atomic)
+else()
+  set(PLATFORM_LIBS "")
+endif()
+
 find_package(absl REQUIRED)
 find_package(protobuf REQUIRED)
 find_package(OpenSSL REQUIRED)
@@ -153,5 +159,6 @@ foreach(target "${PROJECT_NAME}_static")
     camouflage-tls
     ${LIBIDN2_LIB}
     ${IOS_LIBS}
+    ${PLATFORM_LIBS}
   )
 endforeach()
