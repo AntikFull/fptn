@@ -22,12 +22,8 @@ else()
   message(FATAL_ERROR "Unsupported platform")
 endif()
 
-if(UNIX AND NOT APPLE)
-  set(PLATFORM_LIBS atomic)
-else()
-  set(PLATFORM_LIBS "")
-endif()
-message(STATUS "DEBUG PROTOCOL: PLATFORM_LIBS is '${PLATFORM_LIBS}', UNIX is '${UNIX}', APPLE is '${APPLE}'")
+# Примечание: -latomic для 32-бит архитектур добавляется в конце
+# target_link_libraries исполняемого файла, не здесь.
 
 find_package(absl REQUIRED)
 find_package(protobuf REQUIRED)
@@ -160,6 +156,5 @@ foreach(target "${PROJECT_NAME}_static")
     camouflage-tls
     ${LIBIDN2_LIB}
     ${IOS_LIBS}
-    ${PLATFORM_LIBS}
   )
 endforeach()

@@ -8,12 +8,13 @@ else()
   set(TUNTAP_LIB Wintun rpcrt4 iphlpapi Kernel32.lib)
 endif()
 
+# Примечание: atomic для 32-бит (mipsel, armv7) добавляется в самом конце
+# target_link_libraries, после всех .a-зависимостей из Conan.
 if(UNIX AND NOT APPLE)
-  set(PLATFORM_LIBS atomic)
+  set(ATOMIC_TAIL_LIB atomic)
 else()
-  set(PLATFORM_LIBS "")
+  set(ATOMIC_TAIL_LIB "")
 endif()
-message(STATUS "DEBUG CLIENT: PLATFORM_LIBS is '${PLATFORM_LIBS}', UNIX is '${UNIX}', APPLE is '${APPLE}'")
 
 find_package(OpenSSL REQUIRED)
 find_package(argparse REQUIRED)
@@ -75,7 +76,7 @@ target_link_libraries(
           "${TUNTAP_LIB}"
           "${BROTLI_DEC_LIB}"
           "${BROTLI_COMMON_LIB}"
-          "${PLATFORM_LIBS}")
+          "${ATOMIC_TAIL_LIB}")
 
 # fptn-client-gui
 if("${FPTN_BUILD_WITH_GUI_CLIENT}")

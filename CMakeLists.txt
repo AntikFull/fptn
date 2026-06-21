@@ -95,11 +95,9 @@ if (MSVC)
     add_compile_options(/W4)
 else ()
     add_compile_options(-Wall -pedantic)
-    if (UNIX AND NOT APPLE)
-        if (CMAKE_SIZEOF_VOID_P EQUAL 4)
-            link_libraries(atomic)
-        endif ()
-    endif ()
+    # Примечание: -latomic для 32-бит архитектур (mipsel, armv7) добавляется
+    # в конце target_link_libraries исполняемого файла fptn-client-cli,
+    # чтобы линкер увидел его после всех .a-зависимостей (protobuf, mimalloc, absl).
 endif ()
 
 # --- clang-tidy setup ---
