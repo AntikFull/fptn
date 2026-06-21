@@ -8,7 +8,7 @@
 
 Запустите интерактивный установщик на роутере по SSH:
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/AntikFull/fptn/master/deploy/keenetic/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/AntikFull/fptn-keenetic/master/deploy/keenetic/install.sh)"
 ```
 
 Скрипт автоматически установит все пакеты, скачает бинарный файл под архитектуру вашего процессора (`aarch64`, `armv7`, `mipsel`), создаст туннельный интерфейс в KeeneticOS и настроит веб-панель.
@@ -26,10 +26,10 @@ opkg install lighttpd php8-cgi php8-mod-openssl curl ca-bundle ca-certificates
 ```
 
 ### Шаг 2. Развертывание бинарника
-Скачайте бинарник для вашей архитектуры процессора (посмотрите через `uname -m`) из [Релизов GitHub](https://github.com/AntikFull/fptn/releases/tag/v1.0.0-keenetic) и положите его по пути `/opt/bin/fptn-client-cli`:
+Скачайте бинарник для вашей архитектуры процессора (посмотрите через `uname -m`) из [Релизов GitHub](https://github.com/AntikFull/fptn-keenetic/releases/tag/v1.0.0-keenetic) и положите его по пути `/opt/bin/fptn-client-cli`:
 ```bash
 # Пример для aarch64
-curl -L -o /opt/bin/fptn-client-cli https://github.com/AntikFull/fptn/releases/download/v1.0.0-keenetic/fptn-client-cli-aarch64
+curl -L -o /opt/bin/fptn-client-cli https://github.com/AntikFull/fptn-keenetic/releases/download/v1.0.0-keenetic/fptn-client-cli-aarch64
 chmod +x /opt/bin/fptn-client-cli
 ```
 

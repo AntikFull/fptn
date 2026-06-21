@@ -93,7 +93,7 @@ esac
 echo "Архитектура процессора: $RAW_ARCH ($ARCH_SUFFIX)"
 echo "Скачивание скомпилированного бинарника..."
 
-DOWNLOAD_URL="https://github.com/AntikFull/fptn/releases/download/v1.0.0-keenetic/fptn-client-cli-${ARCH_SUFFIX}"
+DOWNLOAD_URL="https://github.com/AntikFull/fptn-keenetic/releases/download/v1.0.0-keenetic/fptn-client-cli-${ARCH_SUFFIX}"
 if ! curl -L -o /opt/bin/fptn-client-cli "$DOWNLOAD_URL"; then
     echo "Ошибка: Не удалось скачать бинарный файл по адресу: $DOWNLOAD_URL"
     echo "Проверьте интернет-соединение или доступность релиза на GitHub."
@@ -186,7 +186,7 @@ if [ -f "$SCRIPT_DIR/index.php" ]; then
     cp "$SCRIPT_DIR/index.php" "$WWW_DIR/index.php"
 else
     # Иначе скачиваем из GitHub
-    curl -L -o "$WWW_DIR/index.php" "https://raw.githubusercontent.com/AntikFull/fptn/master/deploy/keenetic/index.php"
+    curl -L -o "$WWW_DIR/index.php" "https://raw.githubusercontent.com/AntikFull/fptn-keenetic/master/deploy/keenetic/index.php"
 fi
 chmod 644 "$WWW_DIR/index.php"
 
@@ -208,7 +208,7 @@ echo "[7/7] Настройка службы автозапуска..."
 if [ -f "$SCRIPT_DIR/S53fptn-client" ]; then
     cp "$SCRIPT_DIR/S53fptn-client" "/opt/etc/init.d/S53fptn-client"
 else
-    curl -L -o "/opt/etc/init.d/S53fptn-client" "https://raw.githubusercontent.com/AntikFull/fptn/master/deploy/keenetic/S53fptn-client"
+    curl -L -o "/opt/etc/init.d/S53fptn-client" "https://raw.githubusercontent.com/AntikFull/fptn-keenetic/master/deploy/keenetic/S53fptn-client"
 fi
 chmod 755 /opt/etc/init.d/S53fptn-client
 
