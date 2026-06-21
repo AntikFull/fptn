@@ -8,6 +8,12 @@ else()
   set(TUNTAP_LIB Wintun rpcrt4 iphlpapi Kernel32.lib)
 endif()
 
+if(UNIX AND NOT APPLE)
+  set(PLATFORM_LIBS atomic)
+else()
+  set(PLATFORM_LIBS "")
+endif()
+
 find_package(OpenSSL REQUIRED)
 find_package(argparse REQUIRED)
 find_package(spdlog REQUIRED)
@@ -67,7 +73,8 @@ target_link_libraries(
           fptn-protocol-lib_static
           "${TUNTAP_LIB}"
           "${BROTLI_DEC_LIB}"
-          "${BROTLI_COMMON_LIB}")
+          "${BROTLI_COMMON_LIB}"
+          "${PLATFORM_LIBS}")
 
 # fptn-client-gui
 if("${FPTN_BUILD_WITH_GUI_CLIENT}")
