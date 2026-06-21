@@ -71,11 +71,14 @@ target_link_libraries(
           "${BROTLI_DEC_LIB}"
           "${BROTLI_COMMON_LIB}")
 
-# Добавляем -latomic в самый конец строки линковки через LINK_OPTIONS.
-# Это критично для 32-бит архитектур (mipsel, armv7), где libprotobuf,
-# libmimalloc и libabsl нуждаются в __atomic_fetch_add_8 / __atomic_compare_exchange_8.
-# target_link_libraries(atomic) не работает, т.к. CMake ставит его раньше Conan-зависимостей.
-if(UNIX AND NOT APPLE)
+# Добавляем -latomic только для 32-бит архитектур (mipsel, armv7).
+# На 64-бит (aarch64) libatomic НЕ нужна — аппаратная поддержка есть.
+# --whole-archive нужен чтобы линкер включил все символы из libatomic.a,
+# иначе порядок аргументов в строке линкера не гарантирован CMake.
+# ВАЖНО: на aarch64 --whole-archive libatomic.a подтягивает LSE-хелперы
+# (__aarch64_ldadd1_acq_rel и т.д.), содержащие casal/ldadd инструкции,
+# что вызывает SIGILL на Cortex-A53 (ARMv8.0 без LSE).
+if(UNIX AND NOT APPLE AND CMAKE_SIZEOF_VOID_P EQUAL 4)
   target_link_options("${PROJECT_NAME}-cli" PRIVATE "-Wl,--push-state,--whole-archive" "-latomic" "-Wl,--pop-state")
 endif()
 
