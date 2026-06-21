@@ -34,7 +34,7 @@ jobs:
             apt-packages: gcc-mipsel-linux-gnu g++-mipsel-linux-gnu
             cc: mipsel-linux-gnu-gcc
             cxx: mipsel-linux-gnu-g++
-            flags: '["-DOPENSSL_PTHREADS", "-pthread", "-march=mips32r2"]'
+            flags: '["-DOPENSSL_PTHREADS", "-pthread", "-march=mips32r2", "-fcoroutines"]'
             asmflags: "-DOPENSSL_PTHREADS -pthread -march=mips32r2"
 
     steps:

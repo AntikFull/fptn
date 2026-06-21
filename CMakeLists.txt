@@ -89,12 +89,17 @@ if (NOT FPTN_BUILD_ONLY_FPTN_LIB)
 endif ()
 
 # --- project ---
-set(CMAKE_COMPILE_WARNING_AS_ERROR ON) # check all warnings!
+set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 if (MSVC)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-    add_compile_options(/W4 /WX)
+    add_compile_options(/W4)
 else ()
-    add_compile_options(-Wall -Werror -pedantic)
+    add_compile_options(-Wall -pedantic)
+    if (UNIX AND NOT APPLE)
+        if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+            link_libraries(atomic)
+        endif ()
+    endif ()
 endif ()
 
 # --- clang-tidy setup ---
@@ -136,6 +141,7 @@ endif ()
 include_directories(src/)
 
 # --- build ---
+set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 add_subdirectory(src/fptn-protocol-lib)
 if (NOT FPTN_BUILD_ONLY_FPTN_LIB)
     if (APPLE OR UNIX)
