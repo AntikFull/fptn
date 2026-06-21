@@ -1,0 +1,80 @@
+name: Build FPTN Client for Keenetic
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build for ${{ matrix.arch-name }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch-name: aarch64
+            conan-arch: armv8
+            apt-packages: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+            cc: aarch64-linux-gnu-gcc
+            cxx: aarch64-linux-gnu-g++
+          - arch-name: armv7
+            conan-arch: armv7
+            apt-packages: gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+            cc: arm-linux-gnueabihf-gcc
+            cxx: arm-linux-gnueabihf-g++
+          - arch-name: mipsel
+            conan-arch: mips
+            apt-packages: gcc-mipsel-linux-gnu g++-mipsel-linux-gnu
+            cc: mipsel-linux-gnu-gcc
+            cxx: mipsel-linux-gnu-g++
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ninja-build pkg-config ${{ matrix.apt-packages }}
+          pip install conan
+
+      - name: Configure Conan profile
+        run: |
+          conan profile detect --force
+          cat << 'EOF' > ~/.conan2/profiles/${{ matrix.arch-name }}_cross
+          [settings]
+          os=Linux
+          arch=${{ matrix.conan-arch }}
+          compiler=gcc
+          compiler.version=11
+          compiler.libcxx=libstdc++11
+          compiler.cppstd=gnu17
+          build_type=Release
+
+          [conf]
+          tools.build:compiler_executables={"c": "${{ matrix.cc }}", "cpp": "${{ matrix.cxx }}"}
+          EOF
+
+      - name: Install Conan Dependencies
+        run: |
+          conan install . --output-folder=build --build=missing -pr:h=~/.conan2/profiles/${{ matrix.arch-name }}_cross -pr:b=default
+
+      - name: Configure CMake and Build
+        run: |
+          cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build . --config Release --target fptn-client-cli -j$(nproc)
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fptn-client-cli-${{ matrix.arch-name }}
+          path: build/src/fptn-client/fptn-client-cli

@@ -5,6 +5,7 @@ Distributed under the MIT License (https://opensource.org/licenses/MIT)
 =============================================================================*/
 
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 #if defined(__linux__) || defined(__APPLE__)
 #include <unistd.h>  // NOLINT(build/include_order)
@@ -61,6 +62,14 @@ int main(int argc, char* argv[]) {
     argparse::ArgumentParser args("fptn-client", FPTN_VERSION);
     // Required arguments
     args.add_argument("--access-token").required().help("Access token");
+    args.add_argument("--disable-routing")
+        .default_value(false)
+        .implicit_value(true)
+        .help("Disable automatic routing configuration");
+    args.add_argument("--show-servers")
+        .default_value(false)
+        .implicit_value(true)
+        .help("Show servers from access token in JSON format and exit");
     // Optional arguments
     args.add_argument("--out-network-interface")
         .default_value("")
@@ -346,6 +355,22 @@ int main(int argc, char* argv[]) {
     std::string pre_obtained_token;
     try {
       config.Parse();
+      if (args.get<bool>("--show-servers")) {
+        nlohmann::json j;
+        j["service_name"] = config.GetServiceName();
+        j["username"] = config.GetUsername();
+        j["servers"] = nlohmann::json::array();
+        for (const auto& s : config.GetServers()) {
+          nlohmann::json sj;
+          sj["name"] = s.name;
+          sj["host"] = s.host;
+          sj["port"] = s.port;
+          sj["md5_fingerprint"] = s.md5_fingerprint;
+          j["servers"].push_back(sj);
+        }
+        std::cout << j.dump() << std::endl;
+        return EXIT_SUCCESS;
+      }
       bool use_login_race = preferred_server.empty();
       if (!preferred_server.empty()) {
         auto server_opt = config.GetServer(preferred_server);
@@ -480,10 +505,12 @@ int main(int argc, char* argv[]) {
       client_plugins.push_back(std::move(split_tunnel_plugin));
     }
 
+    const bool disable_routing = args.get<bool>("--disable-routing");
+
     /* vpn client */
     fptn::vpn::VpnManager vpn_client(
         fptn::vpn::VpnManager::Config{.http_client = std::move(http_client),
-            .route_manager = route_manager,
+            .route_manager = disable_routing ? nullptr : route_manager,
             .virtual_net_interface = virtual_network_interface,
             .plugins = std::move(client_plugins)});
 
